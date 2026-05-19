@@ -9,6 +9,8 @@ motim captures browser HTTP(S) traffic into a local SQLite DB (`~/.motim/motim.s
 
 **Always use `--json` for structured output.**
 
+**If MCP tools are available** (their names match `search_exchanges`, `show_exchange`, `cat_exchange`, `list_endpoints`, `list_services`, `diff_exchanges`, `around`, `session`, `linkfinder`, `proxy_status`, `replay`, `probe`, `replay_sequence`), **prefer them** over shelling out to the CLI: they return typed JSON directly and avoid subprocess overhead. The decision tree below applies identically — CLI commands and MCP tool names map 1:1 (`motim search …` ↔ `search_exchanges`, `motim show ID` ↔ `show_exchange`, etc.).
+
 ## Decision tree
 
 1. **Need to understand how a service works?** → `motim endpoints`, `motim search`, `motim show`

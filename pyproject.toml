@@ -51,6 +51,9 @@ curl = [
 linkfinder = [
     "jsbeautifier>=1.15.0",
 ]
+mcp = [
+    "mcp>=1.0.0",
+]
 
 [project.scripts]
 motim = "motim.cli.main:cli"

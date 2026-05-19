@@ -607,7 +607,7 @@ class ExchangeDB:
             )
             q = (
                 "SELECT id, ts, scheme, host, port, method, path, query,"
-                " url, status, endpoint, service_key"
+                " url, status, endpoint, service_key "
                 "FROM exchanges "
                 f"WHERE {where} "
                 f"{order} "
@@ -647,7 +647,7 @@ class ExchangeDB:
             )
             q = (
                 "SELECT id, ts, scheme, host, port, method, path, query,"
-                " url, status, endpoint, service_key"
+                " url, status, endpoint, service_key "
                 "FROM exchanges "
                 f"WHERE {where} "
                 f"{order} "

@@ -89,6 +89,40 @@ motim agents-md         # writes AGENTS.md for Codex, opencode, etc.
 
 The skill gives agents a decision tree: when to search, when to replay, when to probe, how to handle auth failures. Agents use the CLI with `--json` — no Python SDK needed.
 
+## Use from any MCP-compatible agent
+
+motim ships a native MCP server, so any Model Context Protocol client — Claude Desktop, Cursor, Cline, Continue, Zed, Goose, Windsurf, etc. — can drive motim without shelling out to the CLI.
+
+```bash
+pip install 'motim[mcp]'
+motim mcp    # runs over stdio
+```
+
+Add to your MCP client config. Example for Claude Desktop (`~/Library/Application Support/Claude/claude_desktop_config.json` on macOS):
+
+```json
+{
+  "mcpServers": {
+    "motim": {
+      "command": "motim",
+      "args": ["mcp"]
+    }
+  }
+}
+```
+
+The server exposes the same surface as the CLI as 13 typed tools:
+
+| Tool | Maps to |
+|---|---|
+| `search_exchanges`, `show_exchange`, `cat_exchange` | `motim search/show/cat` |
+| `list_endpoints`, `list_services` | `motim endpoints/services list` |
+| `diff_exchanges`, `around`, `session` | `motim diff/around/session` |
+| `linkfinder`, `proxy_status` | `motim linkfinder/status` |
+| `replay`, `probe`, `replay_sequence` | `motim replay/probe/replay-seq` |
+
+Read tools are marked `readOnlyHint=true` for friction-free auto-approval. `replay`, `probe`, and `replay_sequence` send real network requests and write results back to the DB — they're marked `destructiveHint=true` so clients can require explicit consent.
+
 ## CLI reference
 
 ```bash
