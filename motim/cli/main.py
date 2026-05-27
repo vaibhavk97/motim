@@ -1160,6 +1160,26 @@ def init(skip_cert: bool):
     else:
         click.echo(f"       ✗ Skill source not found: {SKILL_SOURCE}", err=True)
 
+    # Optional: print MCP config snippet if mcp extra is installed
+    try:
+        import importlib.util
+
+        if importlib.util.find_spec("mcp") is not None:
+            click.echo("\n[bonus] Native MCP server available.")
+            click.echo("        Add this to your MCP client config (e.g. Claude Desktop's")
+            click.echo("        claude_desktop_config.json) to use motim from any MCP agent:")
+            click.echo("")
+            click.echo("        {")
+            click.echo('          "mcpServers": {')
+            click.echo('            "motim": {')
+            click.echo('              "command": "motim",')
+            click.echo('              "args": ["mcp"]')
+            click.echo("            }")
+            click.echo("          }")
+            click.echo("        }")
+    except Exception:  # pragma: no cover - best-effort hint
+        pass
+
     # Done
     click.echo("\n" + "=" * 60)
     click.echo("SETUP COMPLETE")
@@ -1181,7 +1201,50 @@ Next steps:
 
   5. For Codex / opencode / other agents, run in your project:
      motim agents-md
+
+  6. For MCP-compatible agents (Claude Desktop, Cursor, Cline, etc.),
+     install the MCP extra and use the config snippet above:
+     pip install 'motim[mcp]'
 """)
+
+
+@cli.command()
+@click.option(
+    "--db",
+    "db_path",
+    help="Path to SQLite exchange DB (defaults to config)",
+)
+def mcp(db_path: str | None):
+    """Run the MOTIM MCP server (stdio).
+
+    Exposes motim's search, inspect, and replay primitives as Model
+    Context Protocol tools so any MCP-compatible agent (Claude Desktop,
+    Cursor, Cline, Continue, Zed, etc.) can drive motim without shelling
+    out to the CLI.
+
+    Requires: pip install 'motim[mcp]'
+
+    \b
+    Example Claude Desktop config (~/Library/Application Support/Claude/claude_desktop_config.json):
+
+        {
+          "mcpServers": {
+            "motim": {
+              "command": "motim",
+              "args": ["mcp"]
+            }
+          }
+        }
+    """
+    try:
+        from motim.mcp.server import build_server
+    except ImportError as e:
+        raise click.ClickException(
+            "MCP support is not installed. Install with: pip install 'motim[mcp]'"
+        ) from e
+
+    server = build_server(db_path=db_path)
+    server.run("stdio")
 
 
 @cli.command(name="agents-md")
@@ -1260,8 +1323,13 @@ def doctor(as_json: bool):
     # Check httpx
     checks.append(("httpx installed", find_spec("httpx") is not None))
 
+    # Check MCP (optional)
+    checks.append(("mcp installed (optional)", find_spec("mcp") is not None))
+
     spec_count = len(list(SPECS_DIR.glob("*.yaml"))) if SPECS_DIR.exists() else 0
-    all_ok = all(ok for _, ok in checks)
+    # Optional checks (presence is informational, not required for all_ok)
+    OPTIONAL = {"mcp installed (optional)"}
+    all_ok = all(ok for name, ok in checks if name not in OPTIONAL)
 
     if as_json:
         payload = {

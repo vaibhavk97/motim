@@ -4,6 +4,21 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased]
+
+### Added
+- **Native MCP server** (`motim mcp`). Exposes search, inspect, replay,
+  diff, and probe primitives as Model Context Protocol tools so any
+  MCP-compatible agent (Claude Desktop, Cursor, Cline, Continue, Zed,
+  Goose, Windsurf, etc.) can drive motim without shelling out. Read
+  tools are marked `readOnlyHint`; `replay`/`probe`/`replay_sequence`
+  are marked `destructiveHint`.
+- Optional dependency: `pip install 'motim[mcp]'`.
+- `motim init` now prints a Claude Desktop config snippet when the MCP
+  extra is installed.
+- `motim doctor` reports whether the `mcp` package is available
+  (informational; does not affect the overall health verdict).
+
 ## [0.2.0] - 2025-02-15
 
 ### Added
